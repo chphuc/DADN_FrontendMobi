@@ -6,9 +6,33 @@ const SignUpScreen = ({ navigation }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirmpassword, setConfirmPassword] = useState('');
+    const [error, setError] = useState({ isShow: false, message: '' });
 
-    const handleSignUp = () => {
-        // Your login logic here
+    const handleSignUp = async () => {
+        if (!username || !password || !confirmpassword) {
+            setError({ isShow: true, message: 'Missing data!' })
+            return
+        }
+        if (password != confirmpassword) {
+            setError({ isShow: true, message: 'Repeat password not match!' })
+            return
+        }
+
+        return fetch('http://10.0.2.2:4001/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        })
+            .then(response => response.json())
+            .then(json => {
+                if (json.data) {
+                    navigation.navigate('SignIn')
+                }
+                else setError({ isShow: true, message: json.message })
+            })
+            .catch(error => {
+                console.error(error);
+            });
     }
     const handleSwitchLoginScreen = () => {
         navigation.navigate('SignIn')
@@ -16,7 +40,7 @@ const SignUpScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <Text style={{fontSize: 26, fontWeight: 600}}>Create Account</Text>
+            <Text style={{ fontSize: 26, fontWeight: 600 }}>Create Account</Text>
             <Text style={styles.title}>Create a new account</Text>
             <TextInput
                 style={styles.input}
@@ -38,6 +62,7 @@ const SignUpScreen = ({ navigation }) => {
                 value={confirmpassword}
                 onChangeText={setConfirmPassword}
             />
+            {error && <Text style={{ color: 'red' }}>{error.message}</Text>}
             <View style={{ paddingVertical: 30, width: '100%' }}>
                 <CustomButton title="Signup" onPress={handleSignUp} />
             </View>

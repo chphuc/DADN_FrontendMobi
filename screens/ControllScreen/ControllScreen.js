@@ -1,54 +1,41 @@
 import { View, Text, Button } from 'react-native'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ControllScreenItem from './ControllScreenItem'
 
-const ControllScreen = () => {
-    const data = [
-        {
-            title: 'Temperature',
-            minValue: 0,
-            maxValue: 100,
-            curValue: 60,
-            calculationUnit: '℃',
-            isOpen: true
-        },
-        {
-            title: 'Light',
-            minValue: 0,
-            maxValue: 100,
-            curValue: 50,
-            calculationUnit: 'Lux',
-            isOpen: true
-        },
-        {
-            title: 'Humidity',
-            minValue: 0,
-            maxValue: 100,
-            curValue: 30,
-            calculationUnit: '%',
-            isOpen: true
-        },
-        {
-            title: 'PH concentration',
-            minValue: 0,
-            maxValue: 100,
-            curValue: 30,
-            calculationUnit: '%',
-            isOpen: true
-        },
-        {
-            title: 'Oxygen concentration',
-            minValue: 0,
-            maxValue: 100,
-            curValue: 30,
-            calculationUnit: '%',
-            isOpen: true
-        }
-    ]
+const ControllScreen = ({ pumpData, oxyData, postPumpData, postOxygenData }) => {
+    const [pump, setPump] = useState()
+    const [oxy, setOxy] = useState()
+
     const [isSetting, setIsSetting] = useState(false)
     const onPressSetting = () => {
-        setIsSetting((prev) => (!prev))
+        setIsSetting((prev) => {
+            if (prev) {
+                postPumpData(pump.curValue)
+                postOxygenData(oxy.curValue)
+            }
+
+            return !prev
+        })
     }
+
+    useEffect(() => {
+        if (pumpData) {
+            setPump({
+                title: 'Pump',
+                minValue: 0,
+                maxValue: 4,
+                curValue: +pumpData[0].value,
+            })
+        }
+        if (oxyData) {
+            setOxy({
+                title: 'OxygenPump',
+                minValue: 0,
+                maxValue: 1,
+                curValue: +oxyData[0].value,
+            })
+        }
+    }, [pumpData, oxyData])
 
     return (
         <View style={{ paddingHorizontal: 10 }}>
@@ -60,11 +47,15 @@ const ControllScreen = () => {
                 />
             </View>
             <View>
-                {data.map((item, index) => (
-                    <View key={index}>
-                        <ControllScreenItem isSetting={isSetting} data={item} />
-                    </View>
-                ))}
+                {
+                    pump && oxy ?
+                        <View>
+                            <ControllScreenItem isSetting={isSetting} data={pump} setDataPost={setPump} />
+                            <ControllScreenItem isSetting={isSetting} data={oxy} setDataPost={setOxy} />
+                        </View>
+                        :
+                        <Text>Loading ...</Text>
+                }
             </View>
         </View>
     )

@@ -2,10 +2,11 @@ import { useState } from 'react'
 import { View, Text } from 'react-native'
 import Slider from '@react-native-community/slider'
 
-const ControllScreenItem = ({ isSetting, data }) => {
+const ControllScreenItem = ({ isSetting, data, setDataPost }) => {
     const [valueSlider, setValueSlider] = useState(data.curValue)
     const handleChangeValueSlider = (value) => {
         setValueSlider(value)
+        setDataPost(prev => ({ ...prev, curValue: value }))
     }
     return (
         <View>

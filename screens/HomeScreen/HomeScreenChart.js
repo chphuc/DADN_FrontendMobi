@@ -18,13 +18,18 @@ const HomeScreenChart = ({ data }) => {
     };
     return (
         <View>
-            <LineChart
-                data={data}
-                width={screenWidth}
-                height={220}
-                chartConfig={chartConfig}
-                getDotColor={() => "#000000"}
-            />
+            {
+                data ?
+                    <LineChart
+                        data={data}
+                        width={screenWidth}
+                        height={220}
+                        chartConfig={chartConfig}
+                        getDotColor={() => "#000000"}
+                    />
+                    :
+                    <Text style={{ textAlign: 'center' }}>Click to view chart</Text>
+            }
         </View>
     )
 }
